@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard TPMaaS — June 2026</title>
+<style>
+  :root{
+    --booking-blue:#003580;
+    --action-blue:#006CE4;
+    --light-blue:#F0F6FF;
+    --dark-grey:#1A1A1A;
+    --grey:#5E6671;
+    --grey-soft:#8A929E;
+    --light-grey:#E3E8EE;
+    --line:#E0E6ED;
+    --line-soft:#EDF1F5;
+    --yellow:#FFB700;
+    --yellow-soft:#FFF6E0;
+    --green:#008009;
+    --green-soft:#E4F3E8;
+    --red:#D4111E;
+    --red-soft:#FBE7E8;
+    --na:#8A929E;
+    --na-soft:#EEF1F4;
+    --bg:#F4F6F9;
+    --surface:#FFFFFF;
+    --shadow:0 1px 2px rgba(0,32,80,.04),0 4px 16px rgba(0,32,80,.06);
+    --radius:12px;
+    --size-s:#A8C4E8;
+    --size-s-text:#1A3A5C;
+    --size-m:#006CE4;
+    --size-m-text:#FFFFFF;
+    --size-l:#003580;
+    --size-l-text:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--dark-grey);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 48px}
+
+  /* HEADER */
+  header.top{background:var(--booking-blue);color:#fff;padding:22px clamp(16px,3vw,32px) 0}
+  .top-inner{max-width:1180px;margin:0 auto}
+  .brandrow{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .logo{font-weight:700;font-size:21px;letter-spacing:-.02em;color:#fff;display:flex;align-items:center}
+  .logo .dot{color:var(--yellow);font-size:26px;line-height:0;margin-left:1px}
+  .brand-sep{width:1px;height:22px;background:rgba(255,255,255,.3)}
+  .brand-tag{font-size:13px;color:rgba(255,255,255,.8)}
+  h1{font-weight:700;font-size:clamp(22px,3.4vw,30px);letter-spacing:-.02em;line-height:1.1}
+  .h1-sub{font-size:14px;color:rgba(255,255,255,.75);margin-top:5px;margin-bottom:20px}
+  .sectionnav{display:flex;gap:2px}
+  .snav{appearance:none;background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.7);
+    font-family:inherit;font-size:14.5px;font-weight:600;padding:12px 20px;border-radius:8px 8px 0 0;transition:.15s}
+  .snav:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .snav[aria-selected="true"]{color:var(--booking-blue);background:var(--bg)}
+
+  /* SECTIONS */
+  .section{display:none;padding-top:26px}.section.active{display:block}
+
+  /* INDICATORS */
+  .indicators{display:grid;gap:14px;margin-bottom:24px}
+  .indicators.c3{grid-template-columns:repeat(3,1fr)}.indicators.c4{grid-template-columns:repeat(4,1fr)}
+  .ind{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .ind .bar{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--action-blue)}
+  .ind.red .bar{background:var(--red)}.ind.green .bar{background:var(--green)}.ind.yellow .bar{background:var(--yellow)}
+  .ind .k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey-soft);font-weight:600;margin-bottom:8px}
+  .ind .v{font-weight:700;font-size:30px;line-height:1;letter-spacing:-.02em;color:var(--booking-blue)}
+  .ind.red .v{color:var(--red)}.ind.green .v{color:var(--green)}.ind.yellow .v{color:#B8860B}
+  .ind .meta{font-size:12px;color:var(--grey);margin-top:6px}
+  .ind .warn{font-size:11px;color:var(--red);font-weight:600;margin-top:4px}
+
+  /* SUB TABS */
+  .subtabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .stab{appearance:none;background:none;border:none;cursor:pointer;font-family:inherit;
+    font-size:14px;font-weight:600;color:var(--grey);padding:11px 16px;position:relative;transition:.15s}
+  .stab:hover{color:var(--dark-grey)}
+  .stab[aria-selected="true"]{color:var(--action-blue)}
+  .stab[aria-selected="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;
+    height:2.5px;background:var(--action-blue);border-radius:2px}
+  .stab .badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:7px;font-size:11px;
+    border-radius:20px;background:var(--na-soft);color:var(--grey);font-weight:700;vertical-align:1px}
+  .stab[aria-selected="true"] .badge{background:var(--light-blue);color:var(--action-blue)}
+  .subpanel{display:none;animation:fade .22s ease}.subpanel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px}
+  .card:last-child{margin-bottom:0}
+  .card-title{font-size:15px;font-weight:700;color:var(--booking-blue);padding:18px 20px 0;display:flex;align-items:center;gap:9px}
+  .card-title .sq{width:9px;height:9px;border-radius:2px;background:var(--action-blue);flex:none}
+  .chart-wrap{padding:20px}
+
+  /* SIZE COLORS */
+  .size-s{background:#DEEAF7;color:var(--size-s-text)}
+  .size-m{background:var(--size-m);color:var(--size-m-text)}
+  .size-l{background:var(--size-l);color:var(--size-l-text)}
+  .size-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:5px}
+
+  /* CAPACITY CHART */
+  .cap-outer{display:flex;gap:10px;height:320px}
+  .cap-yaxis{display:flex;flex-direction:column;justify-content:space-between;width:36px;flex:none;padding-bottom:40px;text-align:right}
+  .cap-yaxis span{font-size:11px;color:var(--grey-soft)}
+  .cap-plot{flex:1;position:relative;display:flex;align-items:flex-end;gap:clamp(8px,2vw,28px);padding-bottom:40px;border-bottom:2px solid var(--line)}
+  .cap-gridline{position:absolute;left:0;right:0;height:1px;background:var(--line-soft);pointer-events:none}
+  .cap-gridline.ref{border-top:2px dashed var(--yellow);height:0;background:none}
+  .ref-label{position:absolute;right:4px;top:-16px;font-size:10px;font-weight:700;color:var(--yellow)}
+  .cap-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+  .cap-stack{width:100%;max-width:80px;display:flex;flex-direction:column-reverse;border-radius:6px 6px 0 0;overflow:visible;position:relative;z-index:1}
+  .cap-seg{width:100%;display:flex;align-items:center;justify-content:center;cursor:default;position:relative;transition:opacity .15s;overflow:hidden}
+  .cap-seg:hover{opacity:.82}
+  .cap-seg .segval{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none}
+  .cap-segtip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
+    background:var(--dark-grey);color:#fff;padding:7px 10px;border-radius:7px;width:max-content;max-width:220px;
+    font-size:11.5px;opacity:0;pointer-events:none;transition:.15s;z-index:30;box-shadow:0 6px 18px rgba(0,0,0,.2);text-align:center;line-height:1.4}
+  .cap-seg:hover .cap-segtip{opacity:1;transform:translateX(-50%) translateY(0)}
+  .cap-collabel{position:absolute;bottom:4px;font-size:12px;font-weight:700;color:var(--dark-grey);text-align:center;width:120%;white-space:nowrap}
+  .cap-total{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--booking-blue);white-space:nowrap}
+  .cap-total.over{color:var(--red)}
+  .over-bar{outline:2px solid var(--red);outline-offset:2px;border-radius:6px 6px 0 0}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;padding:0 20px 18px}
+  .legitem{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--grey)}
+  .legdot{width:11px;height:11px;border-radius:3px;flex:none}
+
+  /* FORECAST */
+  .fc-tpm-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .tpmbtn{appearance:none;border:1px solid var(--line);background:var(--surface);cursor:pointer;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--grey);padding:7px 16px;border-radius:20px;transition:.14s}
+  .tpmbtn:hover{border-color:var(--action-blue);color:var(--action-blue)}
+  .tpmbtn.on{background:var(--booking-blue);color:#fff;border-color:var(--booking-blue)}
+  .tpm-cap-badge{display:inline-block;background:var(--light-blue);color:var(--action-blue);font-size:11px;
+    font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px}
+  .tpm-cap-badge.over{background:var(--red-soft);color:var(--red)}
+
+  .fc-outer{display:flex;gap:10px;height:290px}
+  .fc-yaxis{display:flex;flex-direction:column;justify-content:space-between;width:36px;flex:none;padding-bottom:40px;text-align:right}
+  .fc-yaxis span{font-size:11px;color:var(--grey-soft)}
+  .fc-plot{flex:1;position:relative;display:flex;align-items:flex-end;gap:clamp(6px,2vw,20px);padding-bottom:40px;border-bottom:2px solid var(--line)}
+  .fc-gridline{position:absolute;left:0;right:0;height:1px;background:var(--line-soft);pointer-events:none}
+  .fc-group{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+  .fc-bars{display:flex;align-items:flex-end;gap:3px;height:100%;width:100%;justify-content:center}
+  .fc-bar{width:13px;border-radius:3px 3px 0 0;position:relative;transition:opacity .2s,filter .2s;cursor:default;min-height:2px}
+  .fc-bar:hover{opacity:.82}
+  .fc-bar.dimmed{opacity:.15;filter:grayscale(.5)}
+  .fc-bar.empty{background:repeating-linear-gradient(45deg,var(--na-soft),var(--na-soft) 3px,#fff 3px,#fff 6px);
+    height:8px!important;border:1px solid var(--line)}
+  .fc-bartip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(4px);
+    background:var(--dark-grey);color:#fff;padding:6px 9px;border-radius:6px;width:max-content;max-width:200px;
+    font-size:11px;opacity:0;pointer-events:none;transition:.15s;z-index:20;line-height:1.4}
+  .fc-bar:hover .fc-bartip{opacity:1;transform:translateX(-50%) translateY(0)}
+  .fc-grouplabel{position:absolute;bottom:4px;font-size:12px;font-weight:700;color:var(--dark-grey);white-space:nowrap}
+
+  /* TABLES */
+  .tbl-scroll{overflow-x:auto}
+  table.tbl{border-collapse:collapse;width:100%;min-width:560px}
+  table.tbl th{background:var(--light-blue);color:var(--booking-blue);font-size:12px;font-weight:700;
+    text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.tbl td{padding:11px 14px;font-size:13.5px;border-bottom:1px solid var(--line-soft)}
+  table.tbl tbody tr:last-child td{border-bottom:none}
+  table.tbl tbody tr:hover{background:var(--bg)}
+  .spoc-tag{display:inline-block;background:var(--na-soft);color:var(--grey);font-size:12px;padding:2px 8px;border-radius:5px;font-weight:600}
+  .status-tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:5px}
+  .status-tag.ok{background:var(--green-soft);color:var(--green)}
+  .status-tag.risk{background:var(--red-soft);color:var(--red)}
+  .status-tag.warn{background:var(--yellow-soft);color:#856404}
+  .cap-pct{font-weight:700;font-size:13.5px}
+  .cap-pct.over{color:var(--red)}
+
+  /* KPI MATRIX */
+  .matrix-scroll{overflow-x:auto;border-radius:var(--radius)}
+  table.matrix{border-collapse:collapse;width:100%;min-width:740px}
+  table.matrix th{background:var(--booking-blue);color:#fff;font-size:12.5px;font-weight:700;
+    padding:13px 12px;text-align:center;position:sticky;top:0}
+  table.matrix th.left{text-align:left;padding-left:18px}
+  table.matrix th .ssz{display:block;font-size:10px;font-weight:500;color:rgba(255,255,255,.7);margin-top:1px}
+  table.matrix th.thcol{background:var(--action-blue)}
+  .grpband td{background:var(--light-blue);color:var(--booking-blue);font-size:11px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;padding:8px 18px;border-top:1px solid var(--line)}
+  table.matrix tbody td{padding:11px 12px;text-align:center;border-bottom:1px solid var(--line-soft)}
+  td.kn{text-align:left;padding-left:18px}
+  td.kn .nm{font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:9px}
+  td.kn .code{font-size:11px;color:var(--grey-soft);font-weight:700}
+  td.thcell{font-size:12px;font-weight:700;color:var(--action-blue);white-space:nowrap;background:var(--light-blue)}
+  .cell{display:inline-block;min-width:62px;font-weight:700;font-size:13px;padding:6px 10px;border-radius:7px}
+  .cell.ok{background:var(--green-soft);color:var(--green)}
+  .cell.risk{background:var(--red-soft);color:var(--red)}
+  .cell.na{background:var(--na-soft);color:var(--na)}
+  .toolbar{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+  .toggle{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:600;user-select:none}
+  .toggle input{display:none}
+  .switch{width:38px;height:22px;border-radius:20px;background:var(--light-grey);position:relative;transition:.18s;flex:none}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.18s}
+  .toggle input:checked+.switch{background:var(--red)}
+  .toggle input:checked+.switch::after{transform:translateX(16px)}
+  .hint{font-size:12.5px;color:var(--grey)}
+  tr.dimmed{opacity:.28}
+
+  /* CATALOG */
+  table.catalog{border-collapse:collapse;width:100%;min-width:760px}
+  table.catalog th{background:var(--booking-blue);color:#fff;font-size:12px;font-weight:700;
+    text-align:left;padding:12px 14px;vertical-align:top}
+  table.catalog td{padding:13px 14px;font-size:13px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  table.catalog tbody tr:hover{background:var(--bg)}
+  .cat-code{font-weight:700;color:var(--booking-blue);font-size:13.5px}
+  .cat-name{color:var(--grey);font-size:12px;margin-top:2px}
+  .cat-formula{font-family:'SFMono-Regular',Consolas,monospace;font-size:12px;background:var(--bg);
+    padding:6px 9px;border-radius:6px;color:var(--dark-grey);display:inline-block;line-height:1.5}
+  .cat-th{display:inline-block;font-weight:700;font-size:12.5px;padding:4px 9px;border-radius:6px;
+    background:var(--green-soft);color:var(--green);white-space:nowrap}
+  .cat-th.pend{background:var(--na-soft);color:var(--na)}
+
+  /* DELAYS */
+  .delay-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  .dchip{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .dchip .bar{position:absolute;left:0;top:0;bottom:0;width:4px}
+  .dchip.est .bar{background:var(--yellow)}.dchip.dep .bar{background:var(--action-blue)}.dchip.plan .bar{background:var(--red)}
+  .dchip .lab{font-size:12px;color:var(--grey);font-weight:600}
+  .dchip .num{font-weight:700;font-size:30px;margin-top:6px;line-height:1;color:var(--booking-blue)}
+  .dchip.est .num{color:#B8860B}.dchip.plan .num{color:var(--red)}
+  .dchip .of{font-size:11.5px;color:var(--grey-soft);margin-top:3px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .chipbtn{appearance:none;border:1px solid var(--line);background:var(--surface);cursor:pointer;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--grey);padding:7px 13px;border-radius:20px;transition:.14s}
+  .chipbtn:hover{border-color:var(--action-blue);color:var(--action-blue)}
+  .chipbtn.on{background:var(--action-blue);color:#fff;border-color:var(--action-blue)}
+  table.delays{border-collapse:collapse;width:100%;min-width:800px}
+  table.delays th{background:var(--booking-blue);color:#fff;font-size:12px;font-weight:700;
+    text-align:left;padding:11px 14px;white-space:nowrap}
+  table.delays td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  table.delays tbody tr:hover{background:var(--bg)}
+  .dproj{font-size:11px;font-weight:700;color:var(--grey-soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+  .dtask-n{font-weight:600;color:var(--dark-grey)}
+  .tbadge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;display:inline-block;margin-bottom:3px}
+  .tbadge.bad{background:var(--red-soft);color:var(--red)}
+  .tbadge.good{background:var(--green-soft);color:var(--green)}
+  .tbadge.pend{background:var(--na-soft);color:var(--na)}
+  .tsub{font-size:11px;color:var(--grey);margin-top:2px;line-height:1.4}
+  .cause-dep{display:inline-block;background:var(--yellow-soft);color:#856404;border:1px solid #FFD966;
+    font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;line-height:1.4}
+  .cause-risk{display:inline-block;background:var(--light-blue);color:var(--booking-blue);border:1px solid #B8CFF0;
+    font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;line-height:1.4}
+  .cause-plan{display:inline-block;background:var(--red-soft);color:var(--red);border:1px solid #F5C0C3;
+    font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;line-height:1.4}
+
+  /* RISKS & DEPS */
+  .rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .ctable{width:100%;border-collapse:collapse}
+  .ctable th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--grey-soft);
+    font-weight:700;text-align:right;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .ctable th:first-child{text-align:left}
+  .ctable td{padding:9px 12px;text-align:right;font-size:14px;font-weight:600;border-top:1px solid var(--line-soft)}
+  .ctable td:first-child{text-align:left;font-weight:600}
+  .ctable td.tot{font-weight:700}
+  .ctable tr.totrow td{border-top:2px solid var(--line);background:var(--bg)}
+  .ctable.risks .a{color:var(--booking-blue)}.ctable.risks .c{color:var(--green)}.ctable.risks .tot{color:var(--booking-blue)}
+  .ctable.deps .a{color:#856404}.ctable.deps .c{color:var(--green)}.ctable.deps .tot{color:#856404}
+  .ctable tr.totrow .tot{color:var(--dark-grey)}
+
+  footer.foot{margin-top:28px;text-align:center;font-size:11.5px;color:var(--grey-soft)}
+  @media(max-width:860px){
+    .indicators.c3,.indicators.c4{grid-template-columns:repeat(2,1fr)}
+    .delay-summary,.rd-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brandrow">
+      <span class="logo">Booking<span class="dot">.</span></span>
+      <span class="brand-sep"></span>
+      <span class="brand-tag">TPMaaS · Portfolio Management Office</span>
+    </div>
+    <h1>Dashboard TPMaaS</h1>
+    <div class="h1-sub">Monthly close · June 2026 · Data as of 25/06/2026</div>
+    <nav class="sectionnav" role="tablist">
+      <button class="snav" role="tab" aria-selected="true" data-sec="cap">Capacity &amp; Forecast</button>
+      <button class="snav" role="tab" aria-selected="false" data-sec="kpi">KPIs</button>
+      <button class="snav" role="tab" aria-selected="false" data-sec="rd">Risks &amp; Dependencies</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- CAPACITY & FORECAST -->
+  <section class="section active" id="sec-cap">
+    <div class="indicators c3" id="capInd"></div>
+    <div class="subtabs" role="tablist">
+      <button class="stab" role="tab" aria-selected="true" data-sub="capacity">Capacity</button>
+      <button class="stab" role="tab" aria-selected="false" data-sub="forecast">Forecast</button>
+    </div>
+    <div class="subpanel active" id="sub-capacity">
+      <div class="card">
+        <div class="card-title"><span class="sq"></span> Capacity by TPM <span style="font-weight:400;color:var(--grey);font-size:12.5px">· % allocated, stacked by project size</span></div>
+        <div class="chart-wrap">
+          <div id="capChart" style="width:100%;overflow-x:auto"></div>
+        </div>
+        <div class="legend" id="capLegend"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="sq"></span> Assignment Detail</div>
+        <div class="chart-wrap" style="padding-top:14px">
+          <div class="tbl-scroll"><table class="tbl" id="capTable"></table></div>
+        </div>
+      </div>
+    </div>
+    <div class="subpanel" id="sub-forecast">
+      <div class="card">
+        <div class="card-title"><span class="sq"></span> Capacity Forecast <span style="font-weight:400;color:var(--grey);font-size:12.5px">· Jun – Nov by TPM</span></div>
+        <div class="chart-wrap">
+          <div class="fc-tpm-filters" id="fcFilters"></div>
+          <div id="fcChart" style="width:100%;overflow-x:auto"></div>
+          <div class="legend" id="fcLegend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="sq"></span> Forecast Table <span style="font-weight:400;color:var(--grey);font-size:12.5px">· "×" = no data yet</span></div>
+        <div class="chart-wrap" style="padding-top:14px">
+          <div class="tbl-scroll"><table class="tbl" id="fcTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section class="section" id="sec-kpi">
+    <div class="indicators c4" id="kpiInd"></div>
+    <div class="subtabs" role="tablist">
+      <button class="stab" role="tab" aria-selected="true" data-sub="matrix">KPI Matrix</button>
+      <button class="stab" role="tab" aria-selected="false" data-sub="delays">Delay Detail<span class="badge" id="delayBadge"></span></button>
+      <button class="stab" role="tab" aria-selected="false" data-sub="catalog">KPI Catalogue</button>
+    </div>
+    <div class="subpanel active" id="sub-matrix">
+      <div class="toolbar">
+        <label class="toggle"><input type="checkbox" id="onlyRed"><span class="switch"></span> Show reds only</label>
+        <span class="hint">The <b>Green Threshold</b> column shows the target value for each KPI.</span>
+      </div>
+      <div class="card" style="margin-bottom:0"><div class="matrix-scroll"><table class="matrix" id="matrix"></table></div></div>
+    </div>
+    <div class="subpanel" id="sub-delays">
+      <div class="delay-summary" id="delaySummary"></div>
+      <div class="filters" id="delayFilters"></div>
+      <div class="card" style="margin-bottom:0"><div class="tbl-scroll"><table class="delays" id="delayTable"></table></div></div>
+    </div>
+    <div class="subpanel" id="sub-catalog">
+      <div class="card" style="margin-bottom:0"><div class="tbl-scroll"><table class="catalog" id="catalog"></table></div></div>
+    </div>
+  </section>
+
+  <!-- RISKS & DEPENDENCIES -->
+  <section class="section" id="sec-rd">
+    <div class="indicators c4" id="rdInd"></div>
+    <div class="rd-grid">
+      <div class="card">
+        <div class="card-title"><span class="sq" style="background:var(--booking-blue)"></span> Risks</div>
+        <div class="chart-wrap" style="padding-top:12px"><table class="ctable risks" id="riskCounts"></table></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="sq" style="background:var(--yellow)"></span> Dependencies</div>
+        <div class="chart-wrap" style="padding-top:12px"><table class="ctable deps" id="depCounts"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">Dashboard TPMaaS · Booking.com · Internal PMO use only · June 2026</footer>
+</div>
+
+<script>
+/* ===== DATA ===== */
+const TPMS_CAP=['Alfredo','Fernanda','Luisa','Paulina'];
+const TPMS_ALL=['Alfredo','Fernanda','Luisa','Paulina','Luis'];
+const MONTHS=['Jun','Jul','Aug','Sep','Oct','Nov'];
+
+// Size colors
+const SIZE_COLOR={S:'#A8C4E8',M:'#006CE4',L:'#003580'};
+const SIZE_TEXT={S:'#1A3A5C',M:'#FFFFFF',L:'#FFFFFF'};
+
+const CAPACITY=[
+  {tpm:'Alfredo',project:'Agentic AI Architecture via MAC',cap:20,size:'S',spoc:'Madhu Madhavan',end:'31/12/2026',status:'ok'},
+  {tpm:'Alfredo',project:'Future fit API Led Architecture',cap:80,size:'M',spoc:'Madhu Madhavan',end:'31/12/2026',status:'ok'},
+  {tpm:'Fernanda',project:'Data Management & Governance',cap:60,size:'L',spoc:'Indy Gill',end:'31/12/2026',status:'ok'},
+  {tpm:'Fernanda',project:'Hybrid ways of working',cap:30,size:'M',spoc:'Indy Gill',end:'31/12/2026',status:'ok'},
+  {tpm:'Fernanda',project:'Data Governance: API & IAM',cap:30,size:'M',spoc:'Indy Gill',end:'31/08/2026',status:'ok'},
+  {tpm:'Paulina',project:'BHI UK',cap:50,size:'M',spoc:'Shaun Bryce',end:'31/12/2026',status:'risk'},
+  {tpm:'Paulina',project:'BPD Common Instance',cap:50,size:'L',spoc:'Tineke Franssen',end:'31/12/2026',status:'ok'},
+  {tpm:'Luisa',project:'SAP UK Payroll',cap:40,size:'M',spoc:'Sirisha Ravuluri',end:'01/04/2027',status:'ok'},
+  {tpm:'Luisa',project:'FH - Job Architecture Phase 2',cap:60,size:'L',spoc:'Shaun Bryce',end:'16/11/2026',status:'warn'},
+];
+
+// Forecast: total % per TPM per month
+const FORECAST={
+  Alfredo:   {Jun:100,Jul:100,Aug:100,Sep:100, Oct:100, Nov:100},
+  Fernanda:  {Jun:120,Jul:100,Aug:100,Sep:100, Oct:100, Nov:100},
+  Luisa:     {Jun:100,Jul:100,Aug:100,Sep:100, Oct:100, Nov:100},
+  Paulina:   {Jun:100,Jul:100,Aug:100,Sep:100, Oct:100, Nov:100},
+  Luis:      {Jun:null,Jul:30, Aug:30, Sep:30,  Oct:30,  Nov:30},
+};
+
+// Month colors for forecast bars
+const MCOLORS={Jun:'#003580',Jul:'#1A4D9A',Aug:'#006CE4',Sep:'#4A90D9',Oct:'#7AB3E8',Nov:'#A8C4E8'};
+
+const PROJECTS=[
+  {id:'uk',name:'UK Payroll',size:'M'},
+  {id:'fh',name:'FH – Job Architecture',size:'L'},
+  {id:'bpd',name:'BPD CI',size:'L'},
+  {id:'bhi',name:'BHI UK',size:'M'},
+];
+const projName=id=>PROJECTS.find(p=>p.id===id)?.name||id;
+const shortName=n=>n.replace(' – Job Architecture','').replace('SAP ','');
+
+const KPIS=[
+  {id:'KPI-1',code:'1',name:'Milestone On-Time Rate',th:'≥ 85%',pend:false,group:'Delivery Predictability',
+   desc:'Milestones delivered on time or within ±3 working days of the planned end date.',
+   formula:'(On-time milestones / Total closed milestones) × 100'},
+  {id:'KPI-2',code:'2',name:'Plan Stability Index',th:'≥ 80%',pend:false,group:'Delivery Predictability',
+   desc:'Measures the % of tasks and sub-tasks delivered without delay in the period. A delay occurs when a task starts late and finishes late, or when it takes more days than estimated.',
+   formula:'((Total planned activities − Unfulfilled plans) / Total planned activities) × 100'},
+  {id:'KPI-3',code:'3',name:'Estimation Accuracy Index',th:'≥ 90%',pend:false,group:'Delivery Predictability',
+   desc:'Measures internal delivery precision and scoping quality. Isolates delays caused strictly by underestimating effort or complexity by the internal TPM/Technical team.',
+   formula:'(Actual Days Incurred − Estimated Days) / Estimated Days × 100'},
+  {id:'KPI-4',code:'4',name:'External Dependency Slippage',th:'Pending',pend:true,group:'Delivery Predictability',
+   desc:'Measures timeline delays (slippage) directly introduced by external dependencies, client-side bottlenecks, unmanaged vendor delays, or unplanned executive scope changes.',
+   formula:'Pending definition'},
+  {id:'KPI-5',code:'5',name:'High Risk Trend',th:'Δ ≤ 0%',pend:false,group:'Risk & Dependency Control',
+   desc:'Percentage growth or decrease of high/critical active risks compared to the previous evaluation cycle.',
+   formula:'((Risks(t) − Risks(t−1)) / Risks(t−1)) × 100'},
+  {id:'KPI-6',code:'6',name:'Delay Time',th:'≤ 2 days',pend:false,group:'Risk & Dependency Control',
+   desc:'Average delay in resolving cross-team dependencies past their due date.',
+   formula:'Σ(Date Closed − Due Date) / Resolved dependencies'},
+  {id:'KPI-7',code:'7',name:'Late Risk Identification',th:'≤ 15%',pend:false,group:'Risk & Dependency Control',
+   desc:'Risks captured reactively, only after already impacting the project.',
+   formula:'(Post-impact risks / Total risks) × 100'},
+  {id:'KPI-8',code:'8',name:'Risk Closure Rate',th:'≥ 60%',pend:false,group:'Risk & Dependency Control',
+   desc:'Risks closed during the period relative to those open at the start.',
+   formula:'(Closed risks / Open risks at start of period) × 100'},
+  {id:'KPI-9',code:'9',name:'Reporting Timeliness',th:'≥ 95%',pend:false,group:'Governance & Release',
+   desc:'Status reports updated on time in Jira according to the PMO calendar.',
+   formula:'(On-time reports / Planned reports) × 100'},
+];
+
+const DATA={
+  uk:{'KPI-1':{d:'N/A',s:'na'},'KPI-2':{d:'84.6%',s:'ok'},'KPI-3':{d:'84.6%',s:'risk'},'KPI-4':{d:'Pending',s:'na'},
+      'KPI-5':{d:'N/A',s:'na'},'KPI-6':{d:'0 d',s:'ok'},'KPI-7':{d:'0%',s:'ok'},'KPI-8':{d:'N/A',s:'na'},'KPI-9':{d:'100%',s:'ok'}},
+  fh:{'KPI-1':{d:'100%',s:'ok'},'KPI-2':{d:'100%',s:'ok'},'KPI-3':{d:'100%',s:'ok'},'KPI-4':{d:'Pending',s:'na'},
+      'KPI-5':{d:'+200%',s:'risk'},'KPI-6':{d:'0 d',s:'ok'},'KPI-7':{d:'0%',s:'ok'},'KPI-8':{d:'200%',s:'ok'},'KPI-9':{d:'100%',s:'ok'}},
+  bpd:{'KPI-1':{d:'50%',s:'risk'},'KPI-2':{d:'77.4%',s:'risk'},'KPI-3':{d:'87.1%',s:'risk'},'KPI-4':{d:'Pending',s:'na'},
+       'KPI-5':{d:'+100%',s:'risk'},'KPI-6':{d:'3 d',s:'risk'},'KPI-7':{d:'0%',s:'ok'},'KPI-8':{d:'33.3%',s:'risk'},'KPI-9':{d:'100%',s:'ok'}},
+  bhi:{'KPI-1':{d:'100%',s:'ok'},'KPI-2':{d:'75%',s:'risk'},'KPI-3':{d:'91.7%',s:'ok'},'KPI-4':{d:'Pending',s:'na'},
+       'KPI-5':{d:'+200%',s:'risk'},'KPI-6':{d:'1.33 d',s:'ok'},'KPI-7':{d:'0%',s:'ok'},'KPI-8':{d:'100%',s:'ok'},'KPI-9':{d:'100%',s:'ok'}},
+};
+
+const RD={
+  uk:{rA:3,rC:0,rT:3,dA:4,dC:1,dT:5},
+  fh:{rA:6,rC:3,rT:9,dA:3,dC:1,dT:4},
+  bpd:{rA:23,rC:7,rT:30,dA:1,dC:2,dT:3},
+  bhi:{rA:4,rC:2,rT:6,dA:2,dC:3,dT:5},
+};
+
+const DELAYS=[
+  {proj:'bhi',task:'Confirmation BHI UK on Booking workday',
+   t1bad:true,t1d:'Late start, late end (3d)',t2bad:false,t2d:'On time',
+   cause:'dep',causeLabel:'Team Kick-off depending on instance definition'},
+  {proj:'bhi',task:'Team requirements Q&A',
+   t1bad:true,t1d:'Late start, still open (6d)',t2bad:false,t2d:'On time',
+   cause:'dep',causeLabel:'Kick-off depending on Q&A requirements answered'},
+  {proj:'bhi',task:'Define Recruitment system',
+   t1bad:true,t1d:'Late start, still open (6d)',t2bad:false,t2d:'On time',
+   cause:'risk',causeLabel:'Delayed Go-Live date due to pending scope'},
+  {proj:'bpd',task:'Communicate selection to bidders',
+   t1bad:true,t1d:'Late start, late end (7d)',t2bad:false,t2d:'On time',
+   cause:'risk',causeLabel:'Implementation proposals out of scope / Delayed Kick-off'},
+  {proj:'bpd',task:'Contract Signing',
+   t1bad:false,t1d:'On time',t2bad:true,t2d:'Underestimated (1d → 4d)',
+   cause:'dep',causeLabel:'Budget approval'},
+  {proj:'bpd',task:'Share upload template',
+   t1bad:false,t1d:'On time',t2bad:true,t2d:'Underestimated (3d → 6d)',
+   cause:'plan',causeLabel:'Poor planning'},
+  {proj:'bpd',task:'Validate onboarding process owner',
+   t1bad:true,t1d:'Late start, late end (7d)',t2bad:false,t2d:'On time',
+   cause:'dep',causeLabel:'Budget approval'},
+  {proj:'bpd',task:'Secure vendor onboarding',
+   t1bad:true,t1d:'Not started (13d)',t2bad:true,t2d:'Underestimated',
+   cause:'dep',causeLabel:'Budget approval'},
+  {proj:'uk',task:'Confirm Fintech point of contacts',
+   t1bad:true,t1d:'Late start, still open (3d)',t2bad:true,t2d:'Underestimated',
+   cause:'risk',causeLabel:'Review and approval from FinTech sponsors pending'},
+  {proj:'uk',task:'Final timeline milestone definition',
+   t1bad:false,t1d:'On time',t2bad:true,t2d:'Underestimated (+3d)',
+   cause:'dep',causeLabel:'Sponsor alignment on go-live date'},
+];
+
+/* ===== HELPERS ===== */
+const H_CAP=240, H_FC=210;
+function capTotals(){const m={};TPMS_CAP.forEach(t=>m[t]=0);CAPACITY.forEach(c=>m[c.tpm]=(m[c.tpm]||0)+c.cap);return m;}
+
+/* ===== CAPACITY ===== */
+(function(){
+  const totals=capTotals();
+  const avg=Math.round(TPMS_CAP.reduce((a,t)=>a+totals[t],0)/TPMS_CAP.length);
+  const overCount=TPMS_CAP.filter(t=>totals[t]>100).length;
+  document.getElementById('capInd').innerHTML=`
+    <div class="ind"><span class="bar"></span><div class="k">TPMs</div><div class="v">${TPMS_CAP.length}</div><div class="meta">Alfredo · Fernanda · Luisa · Paulina</div></div>
+    <div class="ind"><span class="bar"></span><div class="k">Active Projects</div><div class="v">${CAPACITY.length}</div><div class="meta">across the portfolio</div></div>
+    <div class="ind ${avg>100?'red':'yellow'}"><span class="bar"></span><div class="k">Average Capacity</div><div class="v">${avg}%</div><div class="meta">team average allocation${overCount>0?`</div><div class="warn">⚠️ ${overCount} TPM(s) over 100%`:''}</div></div>`;
+
+  // chart — SVG for precise scale and external TPM labels
+  (function(){
+    const W=700, H=320, mL=48, mR=20, mT=30, mB=50;
+    const pH=H-mT-mB, pW=W-mL-mR, maxV=120;
+    const yVals=[0,20,40,60,80,100,120];
+    const colW=pW/TPMS_CAP.length;
+    function yp(v){return mT+pH-(v/maxV)*pH;}
+
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block;overflow:visible">`;
+
+    // gridlines + y axis labels
+    yVals.forEach(v=>{
+      const y=yp(v);
+      const is100=v===100;
+      svg+=`<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="${is100?'#FFB700':'#E0E6ED'}" stroke-width="${is100?2:.7}" stroke-dasharray="${is100?'5,3':''}"/>`;
+      svg+=`<text x="${mL-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A929E" font-family="system-ui,sans-serif">${v}%</text>`;
+    });
+
+    // stacked bars per TPM
+    TPMS_CAP.forEach((t,ti)=>{
+      const segs=CAPACITY.filter(c=>c.tpm===t);
+      const total=totals[t];
+      const isOver=total>100;
+      const cx=mL+ti*colW+colW/2;
+      const bW=Math.min(60, colW*0.55);
+      const bX=cx-bW/2;
+
+      // draw segments bottom-up
+      let cumulative=0;
+      segs.forEach(s=>{
+        const col=SIZE_COLOR[s.size];
+        const segH=(s.cap/maxV)*pH;
+        const y=yp(cumulative+s.cap);
+        svg+=`<rect x="${bX}" y="${y}" width="${bW}" height="${segH}" fill="${col}" rx="0">
+          <title>${s.project} (${s.size}) · ${s.cap}%</title>
+        </rect>`;
+        // % label inside segment if tall enough
+        if(segH>=16){
+          const textCol=s.size==='S'?'#1A3A5C':'#ffffff';
+          svg+=`<text x="${cx}" y="${y+segH/2+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${textCol}" font-family="system-ui,sans-serif">${s.cap}%</text>`;
+        }
+        cumulative+=s.cap;
+      });
+
+      // rounded top corners via overlay rect
+      const topY=yp(total);
+      const totalH=(total/maxV)*pH;
+      svg+=`<rect x="${bX}" y="${topY}" width="${bW}" height="6" rx="4" fill="${SIZE_COLOR[segs[segs.length-1].size]}"/>`;
+
+      // over-100 red outline
+      if(isOver){
+        svg+=`<rect x="${bX-1}" y="${topY-1}" width="${bW+2}" height="${totalH+2}" rx="4" fill="none" stroke="#D4111E" stroke-width="2"/>`;
+      }
+
+      // total % label above bar
+      svg+=`<text x="${cx}" y="${topY-8}" text-anchor="middle" font-size="12" font-weight="700" fill="${isOver?'#D4111E':'#003580'}" font-family="system-ui,sans-serif">${isOver?'⚠️ ':''}${total}%</text>`;
+
+      // TPM name BELOW chart area
+      svg+=`<text x="${cx}" y="${mT+pH+32}" text-anchor="middle" font-size="13" font-weight="700" fill="#1A1A1A" font-family="system-ui,sans-serif">${t}</text>`;
+    });
+
+    // axes
+    svg+=`<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT+pH}" stroke="#C8D0DA" stroke-width="1.5"/>`;
+    svg+=`<line x1="${mL}" y1="${mT+pH}" x2="${W-mR}" y2="${mT+pH}" stroke="#C8D0DA" stroke-width="1.5"/>`;
+
+    svg+=`</svg>`;
+    document.getElementById('capChart').innerHTML=svg;
+  })();
+
+  document.getElementById('capLegend').innerHTML=`
+    <span class="legitem"><span class="legdot" style="background:${SIZE_COLOR.S}"></span>Small (S)</span>
+    <span class="legitem"><span class="legdot" style="background:${SIZE_COLOR.M}"></span>Medium (M)</span>
+    <span class="legitem"><span class="legdot" style="background:${SIZE_COLOR.L}"></span>Large (L)</span>`;
+
+  const statusLabel={ok:'🔄 On track',risk:'🔴 At Risk',warn:'⚠️ Issues'};
+  const statusClass={ok:'ok',risk:'risk',warn:'warn'};
+  let rows='';
+  TPMS_CAP.forEach(t=>{
+    const segs=CAPACITY.filter(c=>c.tpm===t);
+    const tot=totals[t];
+    segs.forEach((s,i)=>{
+      rows+=`<tr>
+        <td>${i===0?`<b>${t}</b>${tot>100?' ⚠️':''}`:''}  </td>
+        <td>${s.project}</td>
+        <td><span class="size-tag size-${s.size.toLowerCase()}">${s.size}</span></td>
+        <td><span class="cap-pct">${s.cap}%</span></td>
+        <td><span class="spoc-tag">${s.spoc}</span></td>
+        <td>${s.end}</td>
+        <td><span class="status-tag ${statusClass[s.status]}">${statusLabel[s.status]}</span></td>
+      </tr>`;
+    });
+  });
+  document.getElementById('capTable').innerHTML=
+    `<thead><tr><th>TPM</th><th>Project</th><th>Size</th><th>Capacity</th><th>Booking SPOC</th><th>Expected End Date</th><th>Status</th></tr></thead><tbody>${rows}</tbody>`;
+})();
+
+/* ===== FORECAST ===== */
+(function(){
+  const junTotals={};
+  TPMS_ALL.forEach(t=>junTotals[t]=FORECAST[t]?.Jun||0);
+
+  const TPM_COLORS={Alfredo:'#003580',Fernanda:'#006CE4',Luisa:'#00A3B4',Paulina:'#6B4EFF',Luis:'#0A9D58'};
+
+  let activeTpm='all';
+  const fw=document.getElementById('fcFilters');
+  fw.innerHTML=[{k:'all',v:'All TPMs'},...TPMS_ALL.map(t=>({k:t,v:t}))].map(f=>{
+    const cap=f.k!=='all'?junTotals[f.k]:null;
+    const over=cap&&cap>100;
+    const badge=cap!=null&&cap>0?`<span class="tpm-cap-badge ${over?'over':''}">${cap}%</span>`:'';
+    return `<button class="tpmbtn ${f.k==='all'?'on':''}" data-tpm="${f.k}">${f.v}${badge}</button>`;
+  }).join('');
+
+  function buildChart(){
+    const W=900,H=310,mL=48,mR=20,mT=30,mB=50;
+    const pW=W-mL-mR, pH=H-mT-mB, maxV=120;
+    const yVals=[0,20,40,60,80,100,120];
+    // Groups = TPMs, bars = months
+    const groupW=pW/TPMS_ALL.length;
+    const barW=Math.min(16, groupW/MONTHS.length-2);
+    function yp(v){return mT+pH-(v/maxV)*pH;}
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">`;
+    // gridlines + y labels
+    yVals.forEach(v=>{
+      const y=yp(v);
+      const is100=v===100;
+      svg+=`<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="${is100?'#FFB700':'#E0E6ED'}" stroke-width="${is100?2:.7}" stroke-dasharray="${is100?'5,3':''}"/>`;
+      svg+=`<text x="${mL-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#8A929E" font-family="system-ui,sans-serif">${v}%</text>`;
+    });
+    // bars: group by TPM, bar per month
+    TPMS_ALL.forEach((t,ti)=>{
+      const gx=mL+ti*groupW;
+      const totalBarW=MONTHS.length*barW+(MONTHS.length-1)*2;
+      const startX=gx+(groupW-totalBarW)/2;
+      const isActive=activeTpm==='all'||activeTpm===t;
+      const op=isActive?1:0.12;
+      MONTHS.forEach((m,mi)=>{
+        const v=FORECAST[t]?.[m];
+        const x=startX+mi*(barW+2);
+        if(v===null||v===undefined){
+          svg+=`<rect x="${x}" y="${yp(4)}" width="${barW}" height="4" rx="1" fill="#E0E6ED" opacity="${op}"><title>${t} · ${m}: no data</title></rect>`;
+        } else {
+          const col=v>100?'#D4111E':MCOLORS[m];
+          const bh=Math.max((v/maxV)*pH,2);
+          svg+=`<rect x="${x}" y="${yp(v)}" width="${barW}" height="${bh}" rx="2" fill="${col}" opacity="${op}"><title>${t} · ${m}: ${v}%</title></rect>`;
+        }
+      });
+      // TPM label BELOW plot area
+      svg+=`<text x="${gx+groupW/2}" y="${mT+pH+30}" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1A1A" font-family="system-ui,sans-serif">${t}</text>`;
+    });
+    // axes
+    svg+=`<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT+pH}" stroke="#C8D0DA" stroke-width="1.5"/>`;
+    svg+=`<line x1="${mL}" y1="${mT+pH}" x2="${W-mR}" y2="${mT+pH}" stroke="#C8D0DA" stroke-width="1.5"/>`;
+    svg+=`</svg>`;
+    document.getElementById('fcChart').innerHTML=svg;
+  }
+
+  buildChart();
+
+  document.getElementById('fcLegend').innerHTML=
+    MONTHS.map(m=>`<span class="legitem"><span class="legdot" style="background:${MCOLORS[m]}"></span>${m}</span>`).join('')+
+    `<span class="legitem"><span class="legdot" style="background:#D4111E"></span>Over 100%</span>`;
+
+  fw.addEventListener('click',e=>{
+    const b=e.target.closest('.tpmbtn');if(!b)return;
+    activeTpm=b.dataset.tpm;
+    fw.querySelectorAll('.tpmbtn').forEach(x=>x.classList.toggle('on',x===b));
+    buildChart();
+  });
+
+  // table
+  let head='<thead><tr><th>TPM</th>'+MONTHS.map(m=>`<th>${m}</th>`).join('')+'</tr></thead>';
+  let body='<tbody>'+TPMS_ALL.map(t=>`<tr><td><b>${t}</b></td>`+MONTHS.map(m=>{
+    const v=FORECAST[t]?.[m];
+    if(v===null||v===undefined)return `<td><span style="color:var(--grey-soft)">×</span></td>`;
+    const col=v>100?'color:var(--red);':'color:var(--booking-blue);';
+    return `<td><span style="font-weight:700;${col}">${v}%</span></td>`;
+  }).join('')+'</tr>').join('')+'</tbody>';
+  document.getElementById('fcTable').innerHTML=head+body;
+})();
+
+/* ===== KPI ROLLUP ===== */
+(function(){
+  let ok=0,risk=0,na=0;
+  PROJECTS.forEach(p=>KPIS.forEach(k=>{const s=DATA[p.id][k.id].s;if(s==='ok')ok++;else if(s==='risk')risk++;else na++;}));
+  let worst={n:'',c:-1};
+  PROJECTS.forEach(p=>{let c=KPIS.filter(k=>DATA[p.id][k.id].s==='risk').length;if(c>worst.c)worst={n:p.name,c};});
+  document.getElementById('kpiInd').innerHTML=`
+    <div class="ind"><span class="bar"></span><div class="k">Projects</div><div class="v">${PROJECTS.length}</div><div class="meta">under monitoring</div></div>
+    <div class="ind green"><span class="bar"></span><div class="k">KPIs on target</div><div class="v">${ok}</div><div class="meta">${Math.round(ok/(ok+risk+na)*100)}% of measured KPIs</div></div>
+    <div class="ind red"><span class="bar"></span><div class="k">Off target</div><div class="v">${risk}</div><div class="meta">require attention</div></div>
+    <div class="ind yellow"><span class="bar"></span><div class="k">Critical focus</div><div class="v" style="font-size:20px;color:#B8860B;padding-top:6px">${shortName(worst.n)}</div><div class="meta">${worst.c} KPIs in red</div></div>`;
+})();
+
+/* ===== MATRIX ===== */
+(function(){
+  const t=document.getElementById('matrix');
+  let head=`<thead><tr><th class="left">Indicator</th><th class="thcol">Green Threshold<span class="ssz">target value</span></th>`;
+  PROJECTS.forEach(p=>head+=`<th>${shortName(p.name)}<span class="ssz">${p.size}</span></th>`);
+  head+=`</tr></thead>`;
+  let body='<tbody>';let last='';
+  KPIS.forEach(k=>{
+    if(k.group!==last){body+=`<tr class="grpband"><td colspan="${PROJECTS.length+2}">${k.group}</td></tr>`;last=k.group;}
+    const hasRed=PROJECTS.some(p=>DATA[p.id][k.id].s==='risk');
+    body+=`<tr data-hasred="${hasRed}"><td class="kn"><span class="nm"><span class="code">${k.id}</span>${k.name}</span></td>`;
+    body+=`<td class="thcell">${k.th}</td>`;
+    PROJECTS.forEach(p=>{const c=DATA[p.id][k.id];body+=`<td><span class="cell ${c.s}">${c.d}</span></td>`;});
+    body+=`</tr>`;
+  });
+  body+='</tbody>';t.innerHTML=head+body;
+  document.getElementById('onlyRed').addEventListener('change',e=>{
+    const on=e.target.checked;
+    t.querySelectorAll('tbody tr:not(.grpband)').forEach(tr=>tr.classList.toggle('dimmed',on&&tr.dataset.hasred!=='true'));
+  });
+})();
+
+/* ===== CATALOG ===== */
+(function(){
+  let h=`<thead><tr><th style="width:180px">KPI Code &amp; Name</th><th>Description</th><th style="width:240px">Formula / Measurement Method</th><th style="width:120px">Green Threshold</th></tr></thead>`;
+  let b='<tbody>'+KPIS.map(k=>`<tr>
+    <td><div class="cat-code">${k.id}</div><div class="cat-name">${k.name}</div></td>
+    <td>${k.desc}</td>
+    <td><span class="cat-formula">${k.formula}</span></td>
+    <td><span class="cat-th ${k.pend?'pend':''}">${k.th}</span></td>
+  </tr>`).join('')+'</tbody>';
+  document.getElementById('catalog').innerHTML=h+b;
+})();
+
+/* ===== DELAYS ===== */
+(function(){
+  document.getElementById('delayBadge').textContent=DELAYS.length;
+  const estN=DELAYS.filter(d=>d.t2bad).length;
+  const depN=DELAYS.filter(d=>d.cause==='dep').length;
+  const planN=DELAYS.filter(d=>d.cause==='plan').length;
+  document.getElementById('delaySummary').innerHTML=`
+    <div class="dchip est"><span class="bar"></span><div class="lab">Poor estimation · KPI-3</div><div class="num">${estN}</div><div class="of">of ${DELAYS.length} delays</div></div>
+    <div class="dchip dep"><span class="bar"></span><div class="lab">External dependency · KPI-4</div><div class="num">${depN}</div><div class="of">of ${DELAYS.length} delays</div></div>
+    <div class="dchip plan"><span class="bar"></span><div class="lab">Poor planning</div><div class="num">${planN}</div><div class="of">of ${DELAYS.length} delays</div></div>`;
+
+  const projs=[...new Set(DELAYS.map(d=>d.proj))];
+  let active='all';
+  const fw=document.getElementById('delayFilters');
+  fw.innerHTML=[{k:'all',v:'All'},...projs.map(id=>({k:id,v:shortName(projName(id))}))].map(f=>`<button class="chipbtn ${f.k==='all'?'on':''}" data-f="${f.k}">${f.v}</button>`).join('');
+
+  function causeHtml(d){
+    if(d.cause==='dep')return `<span class="cause-dep">🔗 ${d.causeLabel}</span>`;
+    if(d.cause==='risk')return `<span class="cause-risk">⚡ ${d.causeLabel}</span>`;
+    return `<span class="cause-plan">📋 ${d.causeLabel}</span>`;
+  }
+
+  const tbl=document.getElementById('delayTable');
+  function render(){
+    const list=active==='all'?DELAYS:DELAYS.filter(d=>d.proj===active);
+    let h=`<thead><tr><th>Project / Task</th><th>KPI-2 · Date Delay</th><th>KPI-3 · Estimation</th><th>KPI-4 · Ext. Dependency</th><th>Cause</th></tr></thead>`;
+    let b='<tbody>'+list.map(d=>`<tr>
+      <td><div class="dproj">${shortName(projName(d.proj))}</div><div class="dtask-n">${d.task}</div></td>
+      <td><span class="tbadge ${d.t1bad?'bad':'good'}">${d.t1bad?'Delay':'On time'}</span><div class="tsub">${d.t1d}</div></td>
+      <td><span class="tbadge ${d.t2bad?'bad':'good'}">${d.t2bad?'Underestimated':'OK'}</span><div class="tsub">${d.t2d}</div></td>
+      <td><span class="tbadge pend">Pending</span></td>
+      <td>${causeHtml(d)}</td>
+    </tr>`).join('')+'</tbody>';
+    tbl.innerHTML=h+b;
+  }
+  fw.addEventListener('click',e=>{
+    const b=e.target.closest('.chipbtn');if(!b)return;
+    active=b.dataset.f;fw.querySelectorAll('.chipbtn').forEach(x=>x.classList.toggle('on',x===b));render();
+  });
+  render();
+})();
+
+/* ===== RISKS & DEPS ===== */
+(function(){
+  const sum=k=>PROJECTS.reduce((a,p)=>a+RD[p.id][k],0);
+  document.getElementById('rdInd').innerHTML=`
+    <div class="ind"><span class="bar" style="background:var(--booking-blue)"></span><div class="k">Active Risks</div><div class="v" style="color:var(--booking-blue)">${sum('rA')}</div><div class="meta">of ${sum('rT')} total</div></div>
+    <div class="ind green"><span class="bar"></span><div class="k">Risks Closed</div><div class="v">${sum('rC')}</div><div class="meta">in the period</div></div>
+    <div class="ind"><span class="bar" style="background:var(--yellow)"></span><div class="k">Active Dependencies</div><div class="v" style="color:#856404">${sum('dA')}</div><div class="meta">of ${sum('dT')} total</div></div>
+    <div class="ind green"><span class="bar"></span><div class="k">Dependencies Closed</div><div class="v">${sum('dC')}</div><div class="meta">in the period</div></div>`;
+
+  function buildTable(prefix){
+    let h=`<thead><tr><th>Project</th><th>Active</th><th>Closed</th><th>Total</th></tr></thead>`;
+    let b='<tbody>'+PROJECTS.map(p=>{const r=RD[p.id];
+      return `<tr><td>${shortName(p.name)}</td><td class="a">${r[prefix+'A']}</td><td class="c">${r[prefix+'C']}</td><td class="tot">${r[prefix+'T']}</td></tr>`;
+    }).join('');
+    b+=`<tr class="totrow"><td class="tot">Total</td><td class="tot">${sum(prefix+'A')}</td><td class="tot">${sum(prefix+'C')}</td><td class="tot">${sum(prefix+'T')}</td></tr></tbody>`;
+    return h+b;
+  }
+  document.getElementById('riskCounts').innerHTML=buildTable('r');
+  document.getElementById('depCounts').innerHTML=buildTable('d');
+})();
+
+/* ===== NAV ===== */
+document.querySelectorAll('.snav').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.snav').forEach(b=>b.setAttribute('aria-selected','false'));
+    btn.setAttribute('aria-selected','true');
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('sec-'+btn.dataset.sec).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+document.querySelectorAll('.subtabs').forEach(group=>{
+  group.querySelectorAll('.stab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      group.querySelectorAll('.stab').forEach(t=>t.setAttribute('aria-selected','false'));
+      tab.setAttribute('aria-selected','true');
+      const sec=group.closest('.section');
+      sec.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+      sec.querySelector('#sub-'+tab.dataset.sub).classList.add('active');
+    });
+  });
+});
+</script>
+</body>
+</html>
